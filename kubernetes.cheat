@@ -1,0 +1,4 @@
+% kubernetes, k8s
+
+# Set (replace) new image for deployment pod
+kubectl set image deployment/<deployment> <container-name>=<image>
