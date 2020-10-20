@@ -1,0 +1,55 @@
+% elasticsearch, elastic, es
+; https://gist.github.com/stephen-puiszis/212b8a8b37f67c670422
+
+# Get elasticsearch instance metadata
+curl -XGET 'http://127.0.0.1:9200/_cat?pretty=true'
+
+# (!) SHUTDOWN (!) elasticsearch instance
+curl -XPOST 'http://127.0.0.1:9200/_shutdown'
+
+# List elasticsearch admin methods
+curl -XGET 'http://127.0.0.1:9200/_cat?pretty=true'
+
+# List elasticsearch indexes
+curl -XGET 'http://127.0.0.1:9200/_cat/indices?pretty=true'
+
+# Get elasticsearch cluster health
+curl -XGET 'http://127.0.0.1:9200/_cluster/health?pretty=true'
+
+# View elasticsearch index
+curl -XGET 'http://127.0.0.1:9200/<existing-index-name>?pretty=true'
+
+# (!) Delete (!) elasticsearch index
+curl -XDELETE 'http://127.0.0.1:9200/<existing-index-name>'
+
+# Create elasticsearch index
+curl -XPOST 'http://127.0.0.1:9200/<index-name>'
+
+# Retrieve elasticsearch document
+curl -XGET 'http://127.0.0.1:9200/<existing-index-name>/<type>/<id>'
+
+# Create elasticsearch document
+curl -XPOST 'http://127.0.0.1:9200/<existing-index-name>/<type>/'
+
+# Create/update specific elasticsearch document
+curl -XPUT 'http://127.0.0.1:9200/<existing-index-name>/<type>/<id>'
+
+# Get elasticsearch mappings for an index
+curl -XGET 'http://127.0.0.1:9200/<existing-index-name>/_mappings?pretty=true'
+
+# Get elasticsearch settings information for an index
+curl -XGET 'http://127.0.0.1:9200/<existing-index-name>/_settings'
+
+# Get elasticsearch mappings for an index type
+curl -XGET 'http://127.0.0.1:9200/<existing-index-name>/<type>/_mappings?pretty=true'
+
+# Get elasticsearch settings information for an index type
+curl -XGET 'http://127.0.0.1:9200/<existing-index-name>/<type>/_settings'
+
+# Search on elasticsearch index
+curl -XGET 'http://127.0.0.1:9200/<existing-index-name>/_search?pretty=true'
+
+# Search on elasticsearch index type
+curl -XGET 'http://127.0.0.1:9200/<existing-index-name>/<type>/_search?pretty=true'
+
+$ existing-index-name: curl -XGET 'http://127.0.0.1:9200/_cat/indices' --- --column 3 --delimiter '\s+'
