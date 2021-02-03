@@ -15,6 +15,9 @@ kubectl patch cronjobs <suspended-cronjob-name> -p '{"spec" : {"suspend" : false
 # Expose port using port-forward
 kubectl get pods -o=custom-columns='NAME:metadata.name,PORTS:spec.containers.*.ports.*.containerPort' | awk 'FNR > 1 && $2 != "<none>" {print $0}'
 
+# Create a new namespace
+kubectl create namespace <new-namespace-name>
+
 $ deployment: kubectl get deployments --- --headers 1 --column 1
 $ image-full-name: docker images --filter dangling=false | awk 'FNR > 1 {print $1":"$2"\t"$3"\t"$4"\t"$5}'
 $ pod-name: kubectl get po --- --headers 1 --column 1
