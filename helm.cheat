@@ -1,0 +1,7 @@
+% helm
+
+# Add new repo
+helm repo add <new-repo-name> "<new-repo-url>" --username="<new-repo-username>" --password="<new-repo-password>"
+
+# List repositories
+helm repo list
