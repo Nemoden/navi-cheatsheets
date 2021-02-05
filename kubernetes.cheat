@@ -18,9 +18,13 @@ kubectl get pods -o=custom-columns='NAME:metadata.name,PORTS:spec.containers.*.p
 # Create a new namespace
 kubectl create namespace <new-namespace-name>
 
+# Describe pod
+kubectl describe po <pod>
+
 $ deployment: kubectl get deployments --- --headers 1 --column 1
 $ image-full-name: docker images --filter dangling=false | awk 'FNR > 1 {print $1":"$2"\t"$3"\t"$4"\t"$5}'
 $ pod-name: kubectl get po --- --headers 1 --column 1
 $ cronjob-name: kubectl get cronjobs --- --headers 1 --column 1
 $ suspended-cronjob-name: kubectl get cronjobs | awk 'NR>1 && $7=="True"{print $0}' --- --column 1
 $ active-cronjob-name: kubectl get cronjobs | awk 'NR>1 && $7=="False"{print $0}' --- --column 1
+$ pod: kubectl get po --- --headers 1 --column 1
