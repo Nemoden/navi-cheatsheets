@@ -1,0 +1,66 @@
+% aws
+
+# dynamo list tables
+aws dynamodb list-tables
+
+# dynamo describe table (with keys and attributes)
+aws dynamodb describe-table --table-name <dynamo-table> --query 'Table.{Name:TableName,Status:TableStatus,Keys:KeySchema,Attributes:AttributeDefinitions}' --output table
+
+# dynamo get primary key
+aws dynamodb describe-table --table-name <dynamo-table> --query 'Table.KeySchema' --output table
+
+# dynamo scan table (clean JSON output)
+aws dynamodb scan --table-name <dynamo-table> --page-size 100 | jq -r '.Items[] | to_entries | map({(.key): (if .value.S then .value.S elif .value.N then .value.N elif .value.BOOL then .value.BOOL elif .value.NULL then null else .value end)}) | add'
+
+# dynamo scan table (table format)
+aws dynamodb scan --table-name <dynamo-table> --page-size 100 --output table
+
+# dynamo scan table (Python deserialize - most robust)
+aws dynamodb scan --table-name <dynamo-table> --page-size 100 | python3 -c "import sys, json; from boto3.dynamodb.types import TypeDeserializer; d = TypeDeserializer(); items = json.load(sys.stdin)['Items']; print(json.dumps([{k: d.deserialize(v) for k, v in item.items()} for item in items], indent=2))"
+
+# dynamo query by partition key
+aws dynamodb query --table-name <dynamo-table> --key-condition-expression "id = :id" --expression-attribute-values '{":id":{"S":"<item-id>"}}'
+
+# dynamo query GSI
+aws dynamodb query --table-name <dynamo-table> --index-name <index-name> --key-condition-expression "<key-name> = :val" --expression-attribute-values '{":val":{"S":"<value>"}}'
+
+# dynamo get item
+aws dynamodb get-item --table-name <dynamo-table> --key '{"id":{"S":"<item-id>"}}'
+
+# dynamo put item
+aws dynamodb put-item --table-name <dynamo-table> --item '{"id":{"S":"<item-id>"},"attribute":{"S":"<value>"}}'
+
+# dynamo update item
+aws dynamodb update-item --table-name <dynamo-table> --key '{"id":{"S":"<item-id>"}}' --update-expression "SET #attr = :val" --expression-attribute-names '{"#attr":"<attribute>"}' --expression-attribute-values '{":val":{"S":"<value>"}}'
+
+# dynamo delete item
+aws dynamodb delete-item --table-name <dynamo-table> --key '{"id":{"S":"<item-id>"}}'
+
+# dynamo count items
+aws dynamodb scan --table-name <dynamo-table> --select COUNT
+
+# dynamo check PITR status
+aws dynamodb describe-continuous-backups --table-name <dynamo-table>
+
+# dynamo enable PITR
+aws dynamodb update-continuous-backups --table-name <dynamo-table> --point-in-time-recovery-specification PointInTimeRecoveryEnabled=true
+
+# dynamo check deletion protection
+aws dynamodb describe-table --table-name <dynamo-table> --query 'Table.DeletionProtectionEnabled'
+
+# dynamo enable deletion protection
+aws dynamodb update-table --table-name <dynamo-table> --deletion-protection-enabled
+
+# dynamo get table size and item count
+aws dynamodb describe-table --table-name <dynamo-table> --query 'Table.{Items:ItemCount,SizeBytes:TableSizeBytes,Status:TableStatus}' --output table
+
+# dynamo list all indexes (primary, GSIs, LSIs)
+aws dynamodb describe-table --table-name <dynamo-table> --query 'Table.{PrimaryKey:KeySchema,GSIs:GlobalSecondaryIndexes,LSIs:LocalSecondaryIndexes}' --output json
+
+# dynamo create backup
+aws dynamodb create-backup --table-name <dynamo-table> --backup-name <dynamo-table>-backup-$(date +%Y%m%d-%H%M%S)
+
+# dynamo list backups
+aws dynamodb list-backups --table-name <dynamo-table>
+
+$ dynamo-table: aws dynamodb list-tables --query "TableNames[]" --output text | tr '\t' '\n'
