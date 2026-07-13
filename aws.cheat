@@ -66,16 +66,9 @@ aws dynamodb list-backups --table-name <dynamo-table>
 # bedrock list inference profiles (APAC invocation needs a profile id, never the bare model id)
 aws bedrock list-inference-profiles --profile <aws-profile> --region <aws-region> --query "inferenceProfileSummaries[].inferenceProfileId"
 
-# bedrock list inference profiles by model family
-aws bedrock list-inference-profiles --profile <aws-profile> --region <aws-region> --query "inferenceProfileSummaries[?contains(inferenceProfileId,'<model-family>')].inferenceProfileId"
-
 # bedrock verify model access with one cheap call
 aws bedrock-runtime converse --profile <aws-profile> --region <aws-region> --model-id <inference-profile-id> --messages '[{"role":"user","content":[{"text":"ping"}]}]' --inference-config '{"maxTokens":10}'
 
 $ dynamo-table: aws dynamodb list-tables --query "TableNames[]" --output text | tr '\t' '\n'
 $ aws-profile: aws configure list-profiles
-$ model-family: echo "opus
-sonnet
-haiku
-fable"
 $ inference-profile-id: aws bedrock list-inference-profiles --query "inferenceProfileSummaries[].inferenceProfileId" --output text | tr '\t' '\n'
