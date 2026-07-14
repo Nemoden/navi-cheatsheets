@@ -64,11 +64,28 @@ aws dynamodb create-backup --table-name <dynamo-table> --backup-name <dynamo-tab
 aws dynamodb list-backups --table-name <dynamo-table>
 
 # bedrock list inference profiles (APAC invocation needs a profile id, never the bare model id)
-aws bedrock list-inference-profiles --profile <aws-profile> --region <aws-region> --query "inferenceProfileSummaries[].[inferenceProfileName,inferenceProfileId]" --output table
+aws bedrock list-inference-profiles --profile <aws-profile> --region <aws-region> --query "inferenceProfileSummaries[].[inferenceProfileName,inferenceProfileId,inferenceProfileArn]" --output table
 
 # bedrock verify model access with one cheap call
 aws bedrock-runtime converse --profile <aws-profile> --region <aws-region> --model-id <inference-profile-id> --messages '[{"role":"user","content":[{"text":"ping"}]}]' --inference-config '{"maxTokens":10}'
 
+# secretsmanager list secrets by name prefix
+aws secretsmanager list-secrets --profile <aws-profile> --region <aws-region> --filters Key=name,Values=<secret-prefix> --query "SecretList[].Name" --output text | tr '\t' '\n'
+
+# secretsmanager get secret value (plaintext string)
+aws secretsmanager get-secret-value --profile <aws-profile> --region <aws-region> --secret-id <secret-id> --query SecretString --output text
+
+# ssm list parameters by name prefix
+aws ssm get-parameters-by-path --profile <aws-profile> --region <aws-region> --path <ssm-path-prefix> --recursive --query "Parameters[].Name" --output text | tr '\t' '\n'
+
+# ssm get parameter value (no decrypt - SecureString stays ciphertext)
+aws ssm get-parameter --profile <aws-profile> --region <aws-region> --name <ssm-param-name> --query "Parameter.Value" --output text
+
+# ssm get parameter value (with decrypt - SecureString returned plaintext)
+aws ssm get-parameter --profile <aws-profile> --region <aws-region> --name <ssm-param-name> --with-decryption --query "Parameter.Value" --output text
+
 $ dynamo-table: aws dynamodb list-tables --query "TableNames[]" --output text | tr '\t' '\n'
 $ aws-profile: aws configure list-profiles
 $ inference-profile-id: aws bedrock list-inference-profiles --query "inferenceProfileSummaries[].inferenceProfileId" --output text | tr '\t' '\n'
+$ secret-id: aws secretsmanager list-secrets --query "SecretList[].Name" --output text | tr '\t' '\n'
+$ ssm-param-name: aws ssm describe-parameters --query "Parameters[].Name" --output text | tr '\t' '\n'
