@@ -84,6 +84,12 @@ aws ssm get-parameter --profile <aws-profile> --region <aws-region> --name <ssm-
 # ssm get parameter value (with decrypt - SecureString returned plaintext)
 aws ssm get-parameter --profile <aws-profile> --region <aws-region> --name <ssm-param-name> --with-decryption --query "Parameter.Value" --output text
 
+# ssm put parameter (String - plaintext, create or update)
+aws ssm put-parameter --profile <aws-profile> --region <aws-region> --name <ssm-param-name> --type String --value <ssm-param-value> --overwrite
+
+# ssm put parameter (SecureString - encrypted with KMS, create or update)
+aws ssm put-parameter --profile <aws-profile> --region <aws-region> --name <ssm-param-name> --type SecureString --value <ssm-param-value> --overwrite
+
 $ dynamo-table: aws dynamodb list-tables --query "TableNames[]" --output text | tr '\t' '\n'
 $ aws-profile: aws configure list-profiles
 $ inference-profile-id: aws bedrock list-inference-profiles --query "inferenceProfileSummaries[].inferenceProfileId" --output text | tr '\t' '\n'
