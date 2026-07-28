@@ -1,0 +1,31 @@
+% tmux
+
+# peek at another window's visible output (target = session:window)
+tmux capture-pane -pt '<tmux-target>'
+
+# capture a pane's full scrollback history
+tmux capture-pane -pt '<tmux-target>' -S -
+
+# dump a pane's full scrollback to a file
+tmux capture-pane -pt '<tmux-target>' -S - > <output-file>
+
+# wait until text appears in a pane, then show the tail (poll monitor, fish)
+while not tmux capture-pane -pt '<tmux-target>' | grep -q '<text>'; sleep 60; end; tmux capture-pane -pt '<tmux-target>' | tail -20
+
+# run a command inside another window
+tmux send-keys -t '<tmux-target>' '<command>' Enter
+
+# live-log a pane to a file (append as output happens)
+tmux pipe-pane -t '<tmux-target>' -o 'cat >> <log-file>'
+
+# stop live-logging a pane
+tmux pipe-pane -t '<tmux-target>'
+
+# start a detached session running a long job
+tmux new-session -d -s <session-name> '<command>'
+
+# list all windows across all sessions
+tmux list-windows -a
+
+$ tmux-target: tmux list-windows -a -F '#{session_name}:#{window_index} #{window_name}' --- --column 1
+$ session-name: tmux ls -F '#{session_name}'
