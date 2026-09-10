@@ -69,6 +69,24 @@ aws bedrock list-inference-profiles --profile <aws-profile> --region <aws-region
 # bedrock verify model access with one cheap call
 aws bedrock-runtime converse --profile <aws-profile> --region <aws-region> --model-id <inference-profile-id> --messages '[{"role":"user","content":[{"text":"ping"}]}]' --inference-config '{"maxTokens":10}'
 
+# bedrock list foundation model ids for one provider
+aws bedrock list-foundation-models --profile <aws-profile> --region <aws-region> --by-provider <bedrock-provider> --query "modelSummaries[].[modelId,modelName]" --output table
+
+# bedrock check model access (agreement = marketplace subscription, entitlement = account enabled, region = offered here)
+aws bedrock get-foundation-model-availability --profile <aws-profile> --region <aws-region> --model-id <bedrock-model-id> --query "[agreementAvailability.status,authorizationStatus,entitlementAvailability,regionAvailability]" --output text
+
+# bedrock list marketplace offers for a model (offer token feeds create-foundation-model-agreement)
+aws bedrock list-foundation-model-agreement-offers --profile <aws-profile> --region <aws-region> --model-id <bedrock-model-id>
+
+# bedrock get offer token for a model
+aws bedrock list-foundation-model-agreement-offers --profile <aws-profile> --region <aws-region> --model-id <bedrock-model-id> --query "offers[0].offerToken" --output text
+
+# bedrock enable model access (one-time marketplace agreement per account; third-party models only, Anthropic needs none)
+aws bedrock create-foundation-model-agreement --profile <aws-profile> --region <aws-region> --model-id <bedrock-model-id> --offer-token <bedrock-offer-token>
+
+# bedrock revoke model access (delete marketplace agreement)
+aws bedrock delete-foundation-model-agreement --profile <aws-profile> --region <aws-region> --model-id <bedrock-model-id>
+
 # secretsmanager list secrets by name prefix
 aws secretsmanager list-secrets --profile <aws-profile> --region <aws-region> --filters Key=name,Values=<secret-prefix> --query "SecretList[].Name" --output text | tr '\t' '\n'
 
@@ -96,5 +114,7 @@ aws ssm delete-parameter --profile <aws-profile> --region <aws-region> --name <s
 $ dynamo-table: aws dynamodb list-tables --query "TableNames[]" --output text | tr '\t' '\n'
 $ aws-profile: aws configure list-profiles
 $ inference-profile-id: aws bedrock list-inference-profiles --query "inferenceProfileSummaries[].inferenceProfileId" --output text | tr '\t' '\n'
+$ bedrock-model-id: aws bedrock list-foundation-models --query "modelSummaries[].modelId" --output text | tr '\t' '\n'
+$ bedrock-provider: aws bedrock list-foundation-models --query "modelSummaries[].providerName" --output text | tr '\t' '\n' | sort -u
 $ secret-id: aws secretsmanager list-secrets --query "SecretList[].Name" --output text | tr '\t' '\n'
 $ ssm-param-name: aws ssm describe-parameters --query "Parameters[].Name" --output text | tr '\t' '\n'
