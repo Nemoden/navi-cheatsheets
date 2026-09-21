@@ -93,6 +93,12 @@ aws secretsmanager list-secrets --profile <aws-profile> --region <aws-region> --
 # secretsmanager get secret value (plaintext string)
 aws secretsmanager get-secret-value --profile <aws-profile> --region <aws-region> --secret-id <secret-id> --query SecretString --output text
 
+# secretsmanager create secret (plaintext string - fails if name already exists)
+aws secretsmanager create-secret --profile <aws-profile> --region <aws-region> --name <secret-name> --secret-string <secret-value>
+
+# secretsmanager put secret value (update existing secret - stores new version)
+aws secretsmanager put-secret-value --profile <aws-profile> --region <aws-region> --secret-id <secret-id> --secret-string <secret-value>
+
 # ssm list parameters by name prefix
 aws ssm get-parameters-by-path --profile <aws-profile> --region <aws-region> --path <ssm-path-prefix> --recursive --query "Parameters[].Name" --output text | tr '\t' '\n'
 
