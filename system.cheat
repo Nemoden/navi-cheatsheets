@@ -1,0 +1,9 @@
+% system, process, ps
+
+# show a process's parent pid, start time to the second and full command line (PPID 1 = orphan)
+ps -o pid,ppid,lstart,command -p <pid>
+
+# show a process's working directory (macOS only; linux: readlink /proc/<pid>/cwd)
+lsof -a -p <pid> -d cwd
+
+$ pid: ps -eo pid=,pcpu=,comm= | sort -k2 -rn | awk '{p=$1; c=$2; $1=$2=""; sub(/^ +/, ""); print p"  "c"%  "$0}' --- --column 1
